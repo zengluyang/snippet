@@ -1,0 +1,425 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>dsp_design</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-12-27"><meta name="DC.source" content="dsp_design.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%****************************dsp_design.m**********************************</span>
+<span class="comment">%**************************************************************************</span>
+<span class="comment">% Name:                                     &#26366;&#36335;&#27915;</span>
+<span class="comment">% Number:                                   2010013060009</span>
+<span class="comment">% Date:                                     2012-12-18</span>
+<span class="comment">% Course:                                   Digital Signal Processing</span>
+<span class="comment">% Curriculum Design:                        Finite Word Length Effect</span>
+<span class="comment">%**************************************************************************</span>
+<span class="comment">% ---------------------specificaion and description------------------------</span>
+<span class="comment">% Design a lowpass IIR filter to process a square wave signal with frequency</span>
+<span class="comment">% being 1kHz, to get a pure sin signal of 1kHz. And suppose the sampling</span>
+<span class="comment">% frequency to be 30kHz.</span>
+<span class="comment">%</span>
+<span class="comment">% Use direct II realization, second-order cascade realization and parallel</span>
+<span class="comment">% realization structure to process the filtering.</span>
+<span class="comment">%</span>
+<span class="comment">% When filtering, suppose input, filter coefficients and calculation results</span>
+<span class="comment">% all are quantized(Preserve two digits after the decimal point).</span>
+
+<span class="comment">% Plot the frequency responose of the IIR filter before quantization.</span>
+<span class="comment">% plot the frequency responose of the IIR filter after quantization.</span>
+<span class="comment">% Compare the outputs of the IIR filter based on three different</span>
+<span class="comment">% realization structures. (plot three outputs in one figure)</span>
+<span class="comment">% -------------------------------------------------------------------------</span>
+
+clear;clc;clf;
+prv_digit = 2;
+<span class="comment">%                                               %preserve two digits after</span>
+<span class="comment">%                                               %the decimal point</span>
+</pre><pre class="codeinput"><span class="comment">%-------------------------signal generation--------------------------------</span>
+fs = 30000;                                     <span class="comment">%sampling frequency 30kHz</span>
+f_sqr = 1000;                                   <span class="comment">%square wave frequency 1kHz</span>
+t = 0:1/fs:0.01;
+sqr = square(2*pi*f_sqr*t);
+sqr_qtz = round(sqr*10^prv_digit)/10^prv_digit;	<span class="comment">%quantized square wave</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+
+<span class="comment">%-------------------------IIR filter design--------------------------------</span>
+Wp = 1100/(fs/2);                               <span class="comment">%passband frequency</span>
+Ws = 1800/(fs/2);                               <span class="comment">%stopband frequency</span>
+Rp = 2;                                         <span class="comment">%passband ripple (dB)</span>
+Rs = 60;                                        <span class="comment">%stopband ripple (dB)</span>
+[N,Wn] = buttord(Wp,Ws,Rp,Rs)                   <span class="comment">%using Butterworth filter</span>
+[num,den] = butter(N,Wn);
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeoutput">
+N =
+
+    15
+
+
+Wn =
+
+    0.0763
+
+</pre><pre class="codeinput"><span class="comment">%------------------IIR filter implementation: directe II-------------------</span>
+num_ = num*10^8.19;
+den_ = den*10^8.19;
+num_qtz = round(num_*10^(prv_digit))/10^(prv_digit);
+den_qtz = round(den_*10^(prv_digit))/10^(prv_digit);
+<span class="comment">%                                               %quantilize coeff of filter</span>
+
+y_dir_II = filter_direct2(num_qtz,den_qtz,sqr_qtz);
+<span class="comment">%                                               %see filter_direct2.m</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeinput"><span class="comment">%-------------IIR filter implementation: second-order cascade--------------</span>
+[sos,g] =tf2sos(num,den);
+num_cas = [];
+den_cas = [];
+<span class="keyword">for</span> ii = 1:length(sos)
+    row = sos(ii,:);
+    num_cas = [num_cas;row(1:3)];
+    den_cas = [den_cas;row(4:6)];
+<span class="keyword">end</span>
+num_cas_qtz = round(num_cas*10^prv_digit)/10^prv_digit;
+den_cas_qtz = round(den_cas*10^prv_digit)/10^prv_digit;
+<span class="comment">%                                               %quantilize coeff of filter</span>
+y_2nd_cas = filter_direct2(num_cas_qtz(1,:),den_cas_qtz(1,:),sqr_qtz);
+<span class="keyword">for</span> ii = 2:length(num_cas_qtz)
+    y_2nd_cas = filter_direct2(num_cas_qtz(ii,:),den_cas_qtz(ii,:),y_2nd_cas);
+<span class="keyword">end</span>
+y_2nd_cas = y_2nd_cas*g;
+<span class="comment">%                                               %cascading direct II</span>
+<span class="comment">%                                               %realiztion.</span>
+
+
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeinput"><span class="comment">%-----------------IIR filter implementation: parallel II-------------------</span>
+<span class="comment">% [r,p,k] = residuez(num,den);</span>
+<span class="comment">% num_para=[];</span>
+<span class="comment">% den_para=[];</span>
+<span class="comment">% for ii = 1:length(r)                            %generate num and den for</span>
+<span class="comment">%     num_para=[num_para;r(ii)];                  %each part of paralle form</span>
+<span class="comment">%     den_para=[den_para;1 -p(ii)];</span>
+<span class="comment">% end</span>
+[k, num_para, den_para] = dir2par(num,den);
+num_para_qtz = round(num_para*10^prv_digit)/10^prv_digit;
+den_para_qtz = round(den_para*10^prv_digit)/10^prv_digit;
+<span class="comment">%                                               %quantilize coeff of filter</span>
+y_para_II = filter(num_para_qtz(1,:),den_para_qtz(1,:),sqr_qtz);
+<span class="keyword">for</span> ii =2:length(num_para_qtz)
+    y_para_II = y_para_II + filter(num_para_qtz(ii,:),den_para_qtz(ii,:),sqr_qtz);
+<span class="keyword">end</span>
+y_para_II = y_para_II + k*sqr_qtz;
+<span class="comment">%                                               %paralleing direct II</span>
+<span class="comment">%                                               %transpoed reliztion,</span>
+<span class="comment">%                                               %as MATLAB function</span>
+<span class="comment">%                                               %filter uses direct II</span>
+<span class="comment">%                                               %transpoed reliztion.</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeinput"><span class="comment">%---------------------------quantized output wave--------------------------</span>
+y_dir_II_qtz = round(y_dir_II*10^prv_digit)/10^prv_digit;
+y_2nd_cas_qtz = round(y_2nd_cas*10^prv_digit)/10^prv_digit;
+y_para_II_qtz = round(y_para_II*10^prv_digit)/10^prv_digit;
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><pre class="codeinput">y = filter_direct2(num,den,sqr);
+err_dir_II_qtz = mean((y_dir_II_qtz-y).^2);
+err_2nd_cas_qtz = mean((y_2nd_cas_qtz-y).^2);
+err_para_II_qtz = mean((y_para_II_qtz-y).^2);
+disp(<span class="string">'quantization error:'</span>);
+fprintf(<span class="string">'\tusing direct II relization:\t\t\t\t%d\n'</span>,err_dir_II_qtz);
+fprintf(<span class="string">'\tusing second-order cascade relization:\t%d\n'</span>,err_2nd_cas_qtz);
+fprintf(<span class="string">'\tusing parallel II relization:\t\t\t%d\n'</span>,err_para_II_qtz);
+</pre><pre class="codeoutput">quantization error:
+	using direct II relization:				8.062761e-002
+	using second-order cascade relization:	3.765025e-002
+	using parallel II relization:			5.466968e-002
+</pre><pre class="codeinput"><span class="comment">%-------------------------------plotting-----------------------------------</span>
+figure(1);
+subplot(2,1,1);
+plot(t,sqr);
+title(<span class="string">'1kHz&#26041;&#27874;&#20449;&#21495;&#26102;&#22495;&#27874;&#24418;(&#37327;&#21270;&#21069;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+subplot(2,1,2);
+plot(t,sqr_qtz);
+title(<span class="string">'1kHz&#26041;&#27874;&#20449;&#21495;&#26102;&#22495;&#27874;&#24418;(&#37327;&#21270;&#21518;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+figure(2);
+subplot(3,1,1);
+plot(t,y_dir_II_qtz);
+title(<span class="string">'&#30452;&#25509;II&#22411;&#23454;&#29616;&#28388;&#27874;&#22120;&#36755;&#20986;&#20449;&#21495;&#65288;1KHz&#27491;&#24358;&#27874;&#65289;(&#37327;&#21270;&#21518;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+figure(2);
+subplot(3,1,2);
+plot(t,y_2nd_cas_qtz);
+title(<span class="string">'2&#38454;&#32423;&#32852;&#22411;&#23454;&#29616;&#28388;&#27874;&#22120;&#36755;&#20986;&#20449;&#21495;&#65288;1KHz&#27491;&#24358;&#27874;&#65289;&#26102;&#22495;&#27874;&#24418;(&#37327;&#21270;&#21518;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+subplot(3,1,3);
+plot(t,y_para_II_qtz);
+title(<span class="string">'&#24182;&#32852;II&#22411;&#23454;&#29616;&#28388;&#27874;&#22120;&#36755;&#20986;&#20449;&#21495;&#65288;1KHz&#27491;&#24358;&#27874;&#65289;&#26102;&#22495;&#27874;&#24418;(&#37327;&#21270;&#21518;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+
+figure(3);
+y_dir_II_no_qtz = filter_direct2(num,den,sqr_qtz);
+plot(t,y_dir_II_no_qtz);
+title(<span class="string">'&#30452;&#25509;II&#22411;&#23454;&#29616;&#28388;&#27874;&#22120;&#36755;&#20986;&#20449;&#21495;&#26102;&#22495;&#27874;&#24418;(&#36755;&#20837;&#36755;&#20986;&#20449;&#21495;&#65292;&#28388;&#27874;&#22120;&#21442;&#25968;&#22343;&#19981;&#37327;&#21270;)'</span>);
+xlabel(<span class="string">'&#26102;&#38388;'</span>);
+ylabel(<span class="string">'&#24133;&#24230;'</span>);
+
+figure(4);freqz(num,den,1024,fs);
+title(<span class="string">'IIR &#28388;&#27874;&#22120;&#37327;&#21270;&#21069;&#39057;&#29575;&#30456;&#24212;'</span>);
+
+figure(5);freqz(num_qtz,den_qtz,1024,fs);
+title(<span class="string">'IIR &#28388;&#27874;&#22120;&#37327;&#21270;&#21518;&#39057;&#29575;&#30456;&#24212;'</span>);
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><img vspace="5" hspace="5" src="dsp_design_01.png" alt=""> <img vspace="5" hspace="5" src="dsp_design_02.png" alt=""> <img vspace="5" hspace="5" src="dsp_design_03.png" alt=""> <img vspace="5" hspace="5" src="dsp_design_04.png" alt=""> <img vspace="5" hspace="5" src="dsp_design_05.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%****************************dsp_design.m**********************************
+%**************************************************************************
+% Name:                                     曾路洋
+% Number:                                   2010013060009
+% Date:                                     2012-12-18
+% Course:                                   Digital Signal Processing 
+% Curriculum Design:                        Finite Word Length Effect 
+%**************************************************************************
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-specificaion and descriptionREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Design a lowpass IIR filter to process a square wave signal with frequency
+% being 1kHz, to get a pure sin signal of 1kHz. And suppose the sampling 
+% frequency to be 30kHz.
+% 
+% Use direct II realization, second-order cascade realization and parallel 
+% realization structure to process the filtering.
+% 
+% When filtering, suppose input, filter coefficients and calculation results 
+% all are quantized(Preserve two digits after the decimal point). 
+
+% Plot the frequency responose of the IIR filter before quantization.
+% plot the frequency responose of the IIR filter after quantization. 
+% Compare the outputs of the IIR filter based on three different 
+% realization structures. (plot three outputs in one figure)
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+
+clear;clc;clf;
+prv_digit = 2;                   
+%                                               %preserve two digits after
+%                                               %the decimal point
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-signal generationREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+fs = 30000;                                     %sampling frequency 30kHz
+f_sqr = 1000;                                   %square wave frequency 1kHz
+t = 0:1/fs:0.01;
+sqr = square(2*pi*f_sqr*t);
+sqr_qtz = round(sqr*10^prv_digit)/10^prv_digit;	%quantized square wave
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-IIR filter designREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+Wp = 1100/(fs/2);                               %passband frequency
+Ws = 1800/(fs/2);                               %stopband frequency
+Rp = 2;                                         %passband ripple (dB)
+Rs = 60;                                        %stopband ripple (dB)
+[N,Wn] = buttord(Wp,Ws,Rp,Rs)                   %using Butterworth filter
+[num,den] = butter(N,Wn);
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHIIR filter implementation: directe IIREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+num_ = num*10^8.19;
+den_ = den*10^8.19;
+num_qtz = round(num_*10^(prv_digit))/10^(prv_digit);
+den_qtz = round(den_*10^(prv_digit))/10^(prv_digit); 
+%                                               %quantilize coeff of filter
+
+y_dir_II = filter_direct2(num_qtz,den_qtz,sqr_qtz);
+%                                               %see filter_direct2.m
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-IIR filter implementation: second-order cascadeREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+[sos,g] =tf2sos(num,den);
+num_cas = [];
+den_cas = [];
+for ii = 1:length(sos)
+    row = sos(ii,:);
+    num_cas = [num_cas;row(1:3)];
+    den_cas = [den_cas;row(4:6)];
+end
+num_cas_qtz = round(num_cas*10^prv_digit)/10^prv_digit;
+den_cas_qtz = round(den_cas*10^prv_digit)/10^prv_digit;
+%                                               %quantilize coeff of filter
+y_2nd_cas = filter_direct2(num_cas_qtz(1,:),den_cas_qtz(1,:),sqr_qtz);
+for ii = 2:length(num_cas_qtz)
+    y_2nd_cas = filter_direct2(num_cas_qtz(ii,:),den_cas_qtz(ii,:),y_2nd_cas);
+end
+y_2nd_cas = y_2nd_cas*g;
+%                                               %cascading direct II
+%                                               %realiztion.
+
+
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-IIR filter implementation: parallel IIREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% [r,p,k] = residuez(num,den);
+% num_para=[];
+% den_para=[];
+% for ii = 1:length(r)                            %generate num and den for 
+%     num_para=[num_para;r(ii)];                  %each part of paralle form
+%     den_para=[den_para;1 -p(ii)];
+% end
+[k, num_para, den_para] = dir2par(num,den);
+num_para_qtz = round(num_para*10^prv_digit)/10^prv_digit;
+den_para_qtz = round(den_para*10^prv_digit)/10^prv_digit;
+%                                               %quantilize coeff of filter
+y_para_II = filter(num_para_qtz(1,:),den_para_qtz(1,:),sqr_qtz);
+for ii =2:length(num_para_qtz)
+    y_para_II = y_para_II + filter(num_para_qtz(ii,:),den_para_qtz(ii,:),sqr_qtz);
+end
+y_para_II = y_para_II + k*sqr_qtz;
+%                                               %paralleing direct II
+%                                               %transpoed reliztion,
+%                                               %as MATLAB function
+%                                               %filter uses direct II 
+%                                               %transpoed reliztion.
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-quantized output waveREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+y_dir_II_qtz = round(y_dir_II*10^prv_digit)/10^prv_digit;
+y_2nd_cas_qtz = round(y_2nd_cas*10^prv_digit)/10^prv_digit;
+y_para_II_qtz = round(y_para_II*10^prv_digit)/10^prv_digit;
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%%
+y = filter_direct2(num,den,sqr);
+err_dir_II_qtz = mean((y_dir_II_qtz-y).^2);
+err_2nd_cas_qtz = mean((y_2nd_cas_qtz-y).^2);
+err_para_II_qtz = mean((y_para_II_qtz-y).^2);
+disp('quantization error:');
+fprintf('\tusing direct II relization:\t\t\t\t%d\n',err_dir_II_qtz);
+fprintf('\tusing second-order cascade relization:\t%d\n',err_2nd_cas_qtz);
+fprintf('\tusing parallel II relization:\t\t\t%d\n',err_para_II_qtz);
+
+%%
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-plottingREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+figure(1);
+subplot(2,1,1);
+plot(t,sqr);
+title('1kHz方波信号时域波形(量化前)');
+xlabel('时间');
+ylabel('幅度');
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+subplot(2,1,2);
+plot(t,sqr_qtz);
+title('1kHz方波信号时域波形(量化后)');
+xlabel('时间');
+ylabel('幅度');
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+figure(2);
+subplot(3,1,1);
+plot(t,y_dir_II_qtz);
+title('直接II型实现滤波器输出信号（1KHz正弦波）(量化后)');
+xlabel('时间');
+ylabel('幅度');
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+figure(2);
+subplot(3,1,2);
+plot(t,y_2nd_cas_qtz);
+title('2阶级联型实现滤波器输出信号（1KHz正弦波）时域波形(量化后)');
+xlabel('时间');
+ylabel('幅度');
+axis([t(1) t(length(t)) -1.5 1.5]);
+
+subplot(3,1,3);
+plot(t,y_para_II_qtz);
+title('并联II型实现滤波器输出信号（1KHz正弦波）时域波形(量化后)');
+xlabel('时间');
+ylabel('幅度');
+
+figure(3);
+y_dir_II_no_qtz = filter_direct2(num,den,sqr_qtz);
+plot(t,y_dir_II_no_qtz);
+title('直接II型实现滤波器输出信号时域波形(输入输出信号，滤波器参数均不量化)');
+xlabel('时间');
+ylabel('幅度');
+
+figure(4);freqz(num,den,1024,fs);
+title('IIR 滤波器量化前频率相应');
+
+figure(5);freqz(num_qtz,den_qtz,1024,fs);
+title('IIR 滤波器量化后频率相应');
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,10 @@
+nx1=0:4;
+x1=ones(1,5);
+nh1=0:4;
+h1=[1 -1 3 0 1];
+nh2=1:4;
+h2=[2 5 4 -1];
+[ny,y]=conv_zly(nx1,x1,nh1,h1);
+subplot(2,1,1),stem(ny,y,'fill'),title('x_1[n]*h_1[n]');
+[ny,y]=conv_zly(nh1,h1,nx1,x1);
+subplot(2,1,2),stem(ny,y,'fill'),title('h_1[n]*x_1[n]');

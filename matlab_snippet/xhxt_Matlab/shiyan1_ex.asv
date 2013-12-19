@@ -1,0 +1,385 @@
+function varargout = shiyan1_ex(varargin)
+
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @shiyan1_ex_OpeningFcn, ...
+                   'gui_OutputFcn',  @shiyan1_ex_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin & isstr(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+
+function shiyan1_ex_OpeningFcn(hObject, eventdata, handles, varargin)
+
+handles.output = hObject;
+
+
+guidata(hObject, handles);
+
+function varargout = shiyan1_ex_OutputFcn(hObject, eventdata, handles)
+
+varargout{1} = handles.output;
+
+
+set(handles.popmenu_xh1,'value',1);
+axes(handles.axes_xh1);
+stem(n,(n==0));
+
+set(handles.popmenu_xh2,'value',1);
+axes(handles.axes_xh2);
+stem(n,(n==0));
+
+
+function popmenu_xh1_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+
+function popmenu_xh1_Callback(hObject, eventdata, handles)
+
+
+xhid=get(hObject,'value');
+axes(handles.axes_xh1);
+set(handles.text6,'string','频率');
+n=[-20:20];
+n1=[-10:10];
+switch xhid
+    case 1
+         stem(n,(n==0));
+         set(handles.edit_am1,'string',1);
+         set(handles.edit_freq1,'string',' ');
+         set(handles.edit_phase1,'string',0);
+    case 2
+        stem(n,(n>=0));
+        set(handles.edit_am1,'string',1);
+        set(handles.edit_freq1,'string',' ');
+        set(handles.edit_phase1,'string',0);
+    case 3
+        stem(n,sin(pi/4*n));
+        set(handles.edit_am1,'string',1);
+        set(handles.edit_freq1,'string','0.125');
+        set(handles.edit_phase1,'string',0);
+    case 4
+        stem(n1,exp(0.125*n1));
+        set(handles.text6,'string','指数');
+        set(handles.edit_am1,'string',1);
+        set(handles.edit_freq1,'string','0.125 ');
+        set(handles.edit_phase1,'string',0);
+    case 5
+        stem(n,sawtooth(2*pi*0.1*n));
+        set(handles.edit_am1,'string',1 );
+        set(handles.edit_freq1,'string',0.1);
+        set(handles.edit_phase1,'string',0);
+    case 6
+        stem(n,square(2*pi*0.1*n));
+        set(handles.edit_am1,'string',1);
+        set(handles.edit_freq1,'string',0.1);
+        set(handles.edit_phase1,'string',0);
+end
+
+
+function popmenu_xh2_CreateFcn(hObject, eventdata, handles).
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'value',1);
+
+
+function popmenu_xh2_Callback(hObject, eventdata, handles)
+
+xhid=get(hObject,'value');
+axes(handles.axes_xh2);
+set(handles.text9,'string','频率');
+n=[-20:20];
+n1=[-10:10];
+switch xhid
+    case 1
+         stem(n,(n==0));
+         set(handles.edit_am2,'string',1);
+         set(handles.edit_freq2,'string',' ');
+         set(handles.edit_phase2,'string',0);
+    case 2
+        stem(n,(n>=0));
+        set(handles.edit_am2,'string',1);
+        set(handles.edit_freq2,'string',' ');
+        set(handles.edit_phase2,'string',0);
+    case 3
+        stem(n,sin(pi/4*n));
+        set(handles.edit_am2,'string',1);
+        set(handles.edit_freq2,'string','0.125');
+        set(handles.edit_phase2,'string',0);
+    case 4
+        stem(n1,exp(0.125*n1));
+        set(handles.text9,'string','指数');
+        set(handles.edit_am2,'string',1);
+        set(handles.edit_freq2,'string','0.125');
+        set(handles.edit_phase2,'string',0);
+   case 5
+        stem(n,sawtooth(2*pi*0.1*n));
+        set(handles.edit_am2,'string',1 );
+        set(handles.edit_freq2,'string',0.1);
+        set(handles.edit_phase2,'string',0);
+    case 6
+        stem(n,square(2*pi*0.1*n));
+        set(handles.edit_am2,'string',1);
+        set(handles.edit_freq2,'string',0.1);
+        set(handles.edit_phase2,'string',0);
+end
+
+function edit_phase1_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+
+set(hObject,'string',0);
+
+function edit_phase1_Callback(hObject, eventdata, handles)
+
+function edit_freq1_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string',' ');
+
+
+function edit_freq1_Callback(hObject, eventdata, handles)
+
+function edit_am1_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string',1);
+
+
+function edit_am1_Callback(hObject, eventdata, handles)
+
+function edit_phase2_CreateFcn(hObject, eventdata, handles)
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string',0);
+
+function edit_phase2_Callback(hObject, eventdata, handles)
+
+function edit_freq2_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string',' ');
+
+function edit_freq2_Callback(hObject, eventdata, handles)
+
+function edit_am2_CreateFcn(hObject, eventdata, handles)
+
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string',1);
+
+
+function pb_xh2_Callback(hObject, eventdata, handles)
+
+a2 = str2double(get(handles.edit_am2,'String'));
+f2 = str2double(get(handles.edit_freq2,'String'));
+p2 = str2double(get(handles.edit_phase2,'String'));
+n1=[-10:10];
+n=[-20:20];
+axes(handles.axes_xh2);
+xhid = get(handles.popmenu_xh2,'Value');
+if p2>-20 & p2<20
+switch xhid
+    case 1
+        stem(n,a2*((n-p1)==0));
+    case 2
+         stem(n,a2*((n-p1)>=0));
+    case 3
+        
+        stem(n,a2*sin(2*pi*f2*(n-p2)));
+        
+    case 4
+        stem(n1,a2*exp(f2*(n1-p2)));
+        
+   case 5
+        stem(n,a2*sawtooth(2*pi*f2*(n-p2)));
+        
+    case 6
+        stem(n,a2*square(2*pi*f2*(n-p2)));
+        
+end
+end
+
+function pb_xh1_Callback(hObject, eventdata, handles)
+
+a1 = str2double(get(handles.edit_am1,'String'));
+f1 = str2double(get(handles.edit_freq1,'String'));
+p1 = str2double(get(handles.edit_phase1,'String'));
+n1=[-10:10];
+n=[-20:20];
+axes(handles.axes_xh1);
+xhid = get(handles.popmenu_xh1,'Value');
+ if p1>-10 & p1<10
+switch xhid
+    case 1
+         stem(n,a1*((n-p1)==0));
+    case 2
+         stem(n,a1*((n-p1)>=0));
+    case 3
+        stem(n,a1*sin(2*pi*f1*(n-p1)));
+        
+    case 4
+        stem(n1,a1*exp(f1*(n1-p1)));
+        
+   case 5
+        stem(n,a1*sawtooth(2*pi*f1*(n-p1)));
+        
+    case 6
+        stem(n,a1*square(2*pi*f1*(n-p1)));
+        
+end
+end
+
+
+function pb_sigadd_Callback(hObject, eventdata, handles)
+
+[y1,y2]=getsigs(handles);
+y=y1+y2;
+n=[-20:20];
+figure,stem(n,y);
+
+
+function pb_multi_Callback(hObject, eventdata, handles)
+
+[y1,y2]=getsigs(handles);
+y=y1.*y2;
+n=[-20:20];
+figure,stem(n,y);
+
+
+function pb_split_Callback(hObject, eventdata, handles)
+
+n=[-10:10];
+y=(n>=0);
+len=length(n);
+for i=1:len
+    y1(i)=y(len+1-i);
+end
+yodd=(y-y1)/2;
+yeven=(y+y1)/2;
+figure,subplot(2,1,1),stem(n,y);title('the unit step funtion for demo');
+subplot(2,2,3),stem(n,yodd);title('the odd part of the function');
+subplot(2,2,4),stem(n,yeven);title('the even part of the function');
+
+function pb_back_Callback(hObject, eventdata, handles)
+
+shiyan1;
+
+function pb_close_Callback(hObject, eventdata, handles)
+
+close(gcf);
+
+function figure1_CreateFcn(hObject, eventdata, handles)
+
+
+
+
+function [y1,y2]=getsigs(handles)
+
+a1 = str2double(get(handles.edit_am1,'String'));
+f1 = str2double(get(handles.edit_freq1,'String'));
+p1 = str2double(get(handles.edit_phase1,'String'));
+
+a2 = str2double(get(handles.edit_am2,'String'));
+f2 = str2double(get(handles.edit_freq2,'String'));
+p2 = str2double(get(handles.edit_phase2,'String'));
+
+if isnan(a1)
+    a1=1;
+end 
+if isnan(a2)
+    a2=1;
+end
+if isnan(f1)
+    f1=1/2/pi;
+end
+if isnan(f2)
+    f2=1/2/pi;
+end
+n=[-20:20];
+n1=[-10:10];
+axes(handles.axes_xh1);
+xhid = get(handles.popmenu_xh1,'Value');
+switch xhid
+    case 1
+         y1=a1*((n-p1)==0);
+    case 2
+         y1=a1*((n-p1)>=0);
+    case 3
+        y1=a1*sin(2*pi*f1*(n-p1));
+    case 4
+        y1=a1*exp(f1*(n1-p1));
+        y1=[zeros(1,10) y1 zeros(1,10)];
+   case 5
+        y1=a1*sawtooth(2*pi*f1*(n-p1));
+    case 6
+        y1=a1*square(2*pi*f1*(n-p1));
+end
+
+xhid1 = get(handles.popmenu_xh2,'Value');
+switch xhid1
+    case 1
+         y2=a2*((n-p2)==0);
+    case 2
+         y2=a2*((n-p2)>=0);
+    case 3
+        y2=a2*sin(2*pi*f2*(n-p2));
+    case 4
+        y2=a2*exp(f2*(n1-p2));
+        y2=[zeros(1,10) y2 zeros(1,10)];
+   case 5
+        y2=a2*sawtooth(2*pi*f2*(n-p2));
+    case 6
+        y2=a2*square(2*pi*f2*(n-p2));
+end
+
+
+function axes_xh1_CreateFcn(hObject, eventdata, handles)
+
+function axes_xh2_CreateFcn(hObject, eventdata, handles)

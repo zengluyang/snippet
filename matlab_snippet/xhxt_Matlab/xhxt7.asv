@@ -1,0 +1,22 @@
+num=[1 0 0]
+den=[1 -0.9 0.81]
+[z,p,k]=tf2zp(num,den)
+zplane(z,p)
+omega=[0:511]*pi/256
+unitcirc=exp(j*omega)
+polevectors1=ones(2,1)*unitcirc-p*ones(1,512)
+polelength1=abs(polevectors1)
+poleangle1=angle(polevectors1)
+zerovectors1=ones(2,1)*unitcirc-z*ones(1,512)
+zerolength1=abs(zerovectors1)
+zeroangle1=angle(zerovectors1)
+%plot(omega,polelength1)
+plot(omega,zerolength1),axis([0 7 -2 2])
+
+a=[1 -0.9 0.81]
+b=[1 0 0]
+H=freqz(b,a,512,'whole')
+length1=abs(H)
+angle1=angle(H)
+%plot(length1)
+plot(angle1)

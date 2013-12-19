@@ -1,0 +1,1 @@
+bash router_wan_ip_cygwin.sh

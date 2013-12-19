@@ -1,0 +1,364 @@
+function varargout = shiyan2_ex(varargin)
+% SHIYAN2_EX M-file for shiyan2_ex.fig
+%      SHIYAN2_EX, by itself, creates a new SHIYAN2_EX or raises the existing
+%      singleton*.
+%
+%      H = SHIYAN2_EX returns the handle to a new SHIYAN2_EX or the handle to
+%      the existing singleton*.
+%
+%      SHIYAN2_EX('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in SHIYAN2_EX.M with the given input arguments.
+%
+%      SHIYAN2_EX('Property','Value',...) creates a new SHIYAN2_EX or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before shiyan2_ex_OpeningFunction gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to shiyan2_ex_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help shiyan2_ex
+
+% Last Modified by GUIDE v2.5 30-Sep-2004 23:17:41
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @shiyan2_ex_OpeningFcn, ...
+                   'gui_OutputFcn',  @shiyan2_ex_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin & isstr(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before shiyan2_ex is made visible.
+function shiyan2_ex_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to shiyan2_ex (see VARARGIN)
+
+% Choose default command line output for shiyan2_ex
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes shiyan2_ex wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = shiyan2_ex_OutputFcn(hObject, eventdata, handles)
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+x = [1 1 1 1 1];
+nx = [0:4];
+y = [1 1 1 1 1];
+ny = [0:4];
+z=conv(x,y);
+nz=[min(nx)+min(ny):max(nx)+max(ny)];
+set(handles.axes_conv,'visible','on');
+axes(handles.axes_conv);
+stem(nz,z);
+title('信号x和y的卷积结果');
+
+a = 1;
+b = [0.5 1 2];
+x = [1 2 3 4];
+nx = [1:4];
+y=filter(b,a,x);
+set(handles.axes_filter,'visible','on');
+axes(handles.axes_filter);
+stem(nx,y);
+title('满足差分方程的系统输出');
+
+% --- Executes during object creation, after setting all properties.
+function edit_conv_x_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_conv_x (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','1 1 1 1 1');
+
+
+function edit_conv_x_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_conv_x (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_conv_x as text
+%        str2double(get(hObject,'String')) returns contents of edit_conv_x as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_conv_nx_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_conv_nx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','[0:4]');
+
+function edit_conv_nx_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_conv_nx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_conv_nx as text
+%        str2double(get(hObject,'String')) returns contents of edit_conv_nx as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_conv_y_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_conv_y (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','1 1 1 1 1');
+
+function edit_conv_y_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_conv_y (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_conv_y as text
+%        str2double(get(hObject,'String')) returns contents of edit_conv_y as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_conv_ny_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_conv_ny (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','[0:4]');
+
+function edit_conv_ny_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_conv_ny (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_conv_ny as text
+%        str2double(get(hObject,'String')) returns contents of edit_conv_ny as a double
+
+
+% --- Executes on button press in pb_enter_conv.
+function pb_enter_conv_Callback(hObject, eventdata, handles)
+% hObject    handle to pb_enter_conv (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+x = str2num(get(handles.edit_conv_x,'String'));
+nx = str2num(get(handles.edit_conv_nx,'String'));
+if length(x)~=length(nx)
+    warndlg('序列x的长度和区域nx不匹配！','警告');
+    return
+end
+y = str2num(get(handles.edit_conv_y,'String'));
+ny = str2num(get(handles.edit_conv_ny,'String'));
+if length(y)~=length(ny)
+    warndlg('序列x的长度和区域nx不匹配！','警告');
+    return
+end
+if length(x)==0 | length(y)==0
+    warndlg('请输入序列 x、y 的值！','警告');
+    return
+end
+z=conv(x,y);
+nz=[min(nx)+min(ny):max(nx)+max(ny)];
+set(handles.axes_conv,'visible','on');
+axes(handles.axes_conv);
+stem(nz,z);
+title('信号x和y的卷积结果');
+% --- Executes during object creation, after setting all properties.
+function edit_filter_a_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_filter_a (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','1');
+
+function edit_filter_a_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_filter_a (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_filter_a as text
+%        str2double(get(hObject,'String')) returns contents of edit_filter_a as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_filter_b_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_filter_b (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','0.5 1 2');
+
+function edit_filter_b_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_filter_b (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_filter_b as text
+%        str2double(get(hObject,'String')) returns contents of edit_filter_b as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_filter_x_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_filter_x (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','1 2 3 4');
+
+function edit_filter_x_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_filter_x (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_filter_x as text
+%        str2double(get(hObject,'String')) returns contents of edit_filter_x as a double
+
+% --- Executes on button press in pb_enter_filter.
+function pb_enter_filter_Callback(hObject, eventdata, handles)
+% hObject    handle to pb_enter_filter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+a = str2num(get(handles.edit_filter_a,'String'));
+b = str2num(get(handles.edit_filter_b,'String'));
+x = str2num(get(handles.edit_filter_x,'String'));
+nx = str2num(get(handles.edit_filter_nx,'String'));
+if length(nx)==0
+    nx=[1:length(x)];
+    set(handles.edit_filter_nx,'String',strcat('[1:', num2str(length(x)), ']'));
+elseif length(nx)~=length(x)
+    warndlg('序列x的长度和区域nx不匹配！','警告');
+    return
+end
+if length(b)==0 | length(a)==0
+    warndlg('请输入向量 a、b 的值！','警告');
+    return
+end
+y=filter(b,a,x);
+set(handles.axes_filter,'visible','on');
+axes(handles.axes_filter);
+stem(nx,y);
+title('满足差分方程的系统输出');
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_filter_nx_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_filter_nx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc
+    set(hObject,'BackgroundColor','white');
+else
+    set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+end
+
+set(hObject,'string','[1:4]');
+
+function edit_filter_nx_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_filter_nx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_filter_nx as text
+%        str2double(get(hObject,'String')) returns contents of edit_filter_nx as a double
+
+
+% --- Executes on button press in pb_back.
+function pb_back_Callback(hObject, eventdata, handles)
+% hObject    handle to pb_back (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close(gcf);
+shiyan2;
+% --- Executes on button press in pb_exit.
+function pb_exit_Callback(hObject, eventdata, handles)
+% hObject    handle to pb_exit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+close(gcf);

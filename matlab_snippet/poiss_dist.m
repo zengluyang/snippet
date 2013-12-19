@@ -1,0 +1,16 @@
+clc;
+name='泊松分布';
+N=20;
+lamda=5;
+Xi=poissrnd(lamda,1,1000);
+mXi=mean(Xi)
+varXi=var(Xi)
+subplot(4,1,1);hist(Xi),title(strcat(name,'直方图'));
+X=0:N;
+Y_pdf=poisspdf(X,lamda);
+subplot(4,1,2);plot(X,Y_pdf),title(strcat(name,'概率密度函数'));
+Y_cdf=poisscdf(X,lamda);
+subplot(4,1,3);plot(X,Y_cdf),title(strcat(name,'概率分布函数'));
+[m,v]=poisstat(lamda)
+[Rx,lags]=xcorr(Xi);
+subplot(4,1,4);plot(lags/1,Rx),title(strcat(name,'信号自相关函数'));

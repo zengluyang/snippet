@@ -1,0 +1,16 @@
+clc;
+name='二项分布';
+N=100;
+p=0.2
+Xi=binornd(N,p,1,1000);
+mXi=mean(Xi)
+varXi=var(Xi)
+subplot(4,1,1);hist(Xi),title(strcat(name,'直方图'));
+X=0:N;
+Y_pdf=binopdf(X,N,p);
+subplot(4,1,2);plot(X,Y_pdf),title(strcat(name,'概率密度函数'));
+Y_cdf=binocdf(X,N,p);
+subplot(4,1,3);plot(X,Y_cdf),title(strcat(name,'概率分布函数'));
+[m,v]=binostat(N,p)
+[Rx,lags]=xcorr(Xi,'none');
+subplot(4,1,4);plot(lags/1,Rx),title(strcat(name,'信号自相关函数'));

@@ -1,0 +1,10 @@
+N = input('The value of N = ');
+k = -N:N;
+y = ones(1,2*N+1);
+w = 0:2*pi/255:2*pi;
+Y = freqz(y, 1, w);
+Ydft = fft(y);
+n = 0:1:2*N;
+k=2*(0:2*N+1);
+plot(w/pi,abs(Y),k,abs(Ydft),'o');
+xlabel('\omega/\pi'),ylabel('Amplitude');

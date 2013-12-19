@@ -1,0 +1,22 @@
+%2.5 linearity and time-invariance 
+%2.5a
+clear;clc;
+x1=[1 zeros(1,5)];
+x2=[0 1 zeros(1,4)];
+x3=[1 2 zeros(1,4)];
+wa=[1];
+wb=[1 -1 -2];
+n=[0:5];
+w1=filter(wb,wa,x1);
+w2=filter(wb,wa,x2);
+w3=filter(wb,wa,x3);
+subplot(3,3,1);stem(n,w1,'fill');title('w_1[n]');
+subplot(3,3,2);stem(n,w2,'fill');title('w_2[n]');
+subplot(3,3,3);stem(n,w3,'fill');title('w_3[n]');
+subplot(3,)
+y1=cos(x1);
+y2=cos(x2);
+y3=cos(x3);
+subplot(3,3,4);stem(n,y1,'fill');title('y_1[n]');
+subplot(3,3,5);stem(n,y2,'fill');title('y_2[n]');
+subplot(3,3,6);stem(n,y3,'fill');title('y_3[n]');

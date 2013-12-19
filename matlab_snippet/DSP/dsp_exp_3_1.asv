@@ -1,0 +1,13 @@
+%dsp_exp_3_1.m
+%1在MATLAB中设计完成可变采样率采样（抽取）程序
+f = 1000;                                   %sin wave frequency 1kHz
+t = 0:1/fs:0.02;
+sig = sin(2*pi*f_sqr*t);
+fs_var = input('Input the sampling frequency:');
+fa_var=2000;                
+t_var = 0:1/fs_var:0.01;
+sig_sa = sin(2*pi*f*t_var);
+subplot(2,1,1);
+plot(t_var,sig_sa);
+subplot(2,1,2);
+plot(fftsjhifft(sig_sa))

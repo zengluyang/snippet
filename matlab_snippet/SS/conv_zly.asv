@@ -1,0 +1,14 @@
+function [n,conv_result]=conv_zly(nx,x,ny,y)
+%带代下标的conv,n是conv_result的下标
+%x存储号x[n]的值(1*n矩阵)，nx存储信号x[n]样本的序号；
+%y,ny同理。
+%Author: 曾路洋 电子科技大学 2011/11/19
+%Copyright:GNU GPL:http://www.gnu.org/licenses/gpl.html
+nx_start=nx(1);
+nx_end=nx(end);
+ny_start=ny(1);
+ny_end=ny(end);
+conv_result=conv(x,y);
+n=(nx_start+ny_start):1:(nx_start+nx_start+nx_end+ny_end);
+return;
+end
